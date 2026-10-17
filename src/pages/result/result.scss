@@ -1,0 +1,81 @@
+.summary {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.cheer {
+  color: #09bb07;
+  margin-left: 12px;
+}
+
+.item .row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mark {
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.item.ok .mark {
+  color: #09bb07;
+}
+
+.item.bad .mark {
+  color: #e64340;
+}
+
+.item.uncertain .mark {
+  color: #f0a020;
+}
+
+.no {
+  font-weight: 600;
+}
+
+.kp {
+  color: #999;
+  font-size: 24px;
+  margin-left: auto;
+}
+
+.q {
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.ans {
+  color: #666;
+  font-size: 28px;
+  margin-top: 8px;
+}
+
+.ans.correct {
+  color: #09bb07;
+}
+
+.confirm-tip {
+  margin-top: 16px;
+  background: #fff7e8;
+  color: #b26a00;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tap-hint {
+  margin-top: 12px;
+  color: #ff8a3c;
+  font-size: 26px;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 200px 0;
+}

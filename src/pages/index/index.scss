@@ -1,0 +1,71 @@
+.container {
+  padding: 48px 32px;
+}
+
+.hero {
+  text-align: center;
+  margin: 80px 0 64px;
+}
+
+.hero-title {
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.hero-sub {
+  color: #888;
+  margin-top: 16px;
+  font-size: 28px;
+}
+
+.last-photo {
+  width: 100%;
+  height: 300px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  background: #eee;
+}
+
+.photo-btn {
+  width: 100%;
+  font-size: 38px;
+  padding: 28px 0;
+
+  &::after {
+    border: none;
+  }
+}
+
+.stats {
+  display: flex;
+  margin-top: 48px;
+}
+
+.stat {
+  flex: 1;
+  text-align: center;
+}
+
+.stat .num {
+  font-size: 56px;
+  font-weight: 700;
+  color: #333;
+}
+
+.stat .num.warn {
+  color: #e64340;
+}
+
+.stat .label {
+  color: #999;
+  font-size: 26px;
+  margin-top: 8px;
+}
+
+.tips {
+  color: #999;
+  font-size: 26px;
+  text-align: center;
+  margin-top: 48px;
+  padding: 0 32px;
+}

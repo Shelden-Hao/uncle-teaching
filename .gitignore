@@ -1,2 +1,18 @@
-.idea
-.vscode
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+.swc/
+.taro-cache/
+
+# 日志与临时文件
+*.log
+.DS_Store
+
+# 预览二维码
+preview-qr.txt
+
+# 编辑器
+.idea/
+.vscode/

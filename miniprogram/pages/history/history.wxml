@@ -1,8 +1,0 @@
-<view wx:if="{{records.length === 0}}" class="empty">还没有批改记录，去拍一拍吧！</view>
-
-<view class="card record" wx:for="{{records}}" wx:key="id"
-      data-id="{{item.id}}" bindtap="onTapRecord">
-  <view class="date">{{item.displayDate}}</view>
-  <view class="summary">{{item.summary}}</view>
-  <view class="arrow">›</view>
-</view>

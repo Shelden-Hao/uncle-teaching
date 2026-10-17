@@ -1,24 +1,20 @@
 {
-  "description": "AI 数学私教 MVP - 微信小程序",
+  "description": "AI 数学私教（Taro 构建，产物在 dist/）",
   "packOptions": {
     "ignore": [],
     "include": []
   },
   "setting": {
     "urlCheck": false,
-    "es6": true,
+    "es6": false,
     "enhance": true,
     "postcss": true,
-    "minified": true,
-    "babelSetting": {
-      "ignore": [],
-      "disablePlugins": [],
-      "outputPath": ""
-    }
+    "minified": true
   },
   "compileType": "miniprogram",
   "libVersion": "3.4.10",
-  "appid": "touristappid",
+  "appid": "wxe5dfcbecfb517d56",
   "projectname": "ai-math-tutor",
-  "condition": {}
+  "condition": {},
+  "miniprogramRoot": "dist/"
 }
