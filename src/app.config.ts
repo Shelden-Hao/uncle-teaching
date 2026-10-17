@@ -1,0 +1,32 @@
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/result/result',
+    'pages/tutor/tutor',
+    'pages/history/history'
+  ],
+  window: {
+    navigationBarBackgroundColor: '#FF8A3C',
+    navigationBarTextStyle: 'white',
+    navigationBarTitleText: 'AI 数学私教',
+    backgroundColor: '#F7F8FA'
+  },
+  tabBar: {
+    color: '#999999',
+    selectedColor: '#FF8A3C',
+    list: [
+      {
+        pagePath: 'pages/index/index',
+        text: '拍一拍',
+        iconPath: 'assets/icons/camera.png',
+        selectedIconPath: 'assets/icons/camera-active.png'
+      },
+      {
+        pagePath: 'pages/history/history',
+        text: '历史',
+        iconPath: 'assets/icons/history.png',
+        selectedIconPath: 'assets/icons/history-active.png'
+      }
+    ]
+  }
+})

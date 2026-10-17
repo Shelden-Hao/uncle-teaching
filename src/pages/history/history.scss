@@ -1,0 +1,26 @@
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 200px 0;
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.record .date {
+  font-weight: 600;
+}
+
+.record .summary {
+  color: #666;
+  font-size: 28px;
+}
+
+.record .arrow {
+  margin-left: auto;
+  color: #ccc;
+  font-size: 40px;
+}

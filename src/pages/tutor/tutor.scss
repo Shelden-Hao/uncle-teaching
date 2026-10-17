@@ -1,0 +1,78 @@
+.tutor-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.chat {
+  flex: 1;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.bubble-wrap {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.bubble-wrap.me {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 75%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.bubble-wrap.me .bubble {
+  background: #ff8a3c;
+  color: #fff;
+}
+
+.loading-hint {
+  color: #999;
+  font-size: 26px;
+}
+
+.quick {
+  display: flex;
+  gap: 16px;
+  padding: 12px 24px;
+
+  button {
+    &::after {
+      border: none;
+    }
+  }
+}
+
+.quick .done {
+  background: #09bb07;
+  color: #fff;
+}
+
+.input-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
+  background: #fff;
+
+  input {
+    flex: 1;
+    background: #f7f8fa;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  button {
+    &::after {
+      border: none;
+    }
+  }
+}
