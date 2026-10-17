@@ -4,7 +4,11 @@
 
 ## 技术栈与架构定位
 
-- **框架**：Taro v4.3.0 + **React 19** + TypeScript + Sass
+- **框架**：Taro v4.3.0 + **React 18.3.1** + TypeScript + Sass
+- **⚠️ React 版本约束（重要）**：Taro 4.x 的小程序运行时依赖 React 18 内部 API（`ReactCurrentBatchConfig` 等），
+  **不支持 React 19**——实测升到 React 19 会导致小程序**白屏**（逻辑层报 `Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')`）。
+  因此本仓库锁定 React 18.3.1；**React 19 留给将来的 RN 端使用**（RN 新版基于 React 19，与本目标的最终架构一致）。
+  若后续 Taro 官方支持 React 19，再统一升级。
 - **架构定位（重要）**：
   - 本仓库 = **微信小程序 MVP**，唯一目的是快速验证产品思路，不追求长期演进；
   - **最终移动端（移动 App / 平板）将使用 React Native 独立实现**，Taro 不承担该目标；
@@ -43,6 +47,21 @@ pnpm build:weapp      # 小程序生产构建 → dist/
 ## 微信开发者工具联调
 
 工具中「导入项目」选择**项目根目录**（`project.config.json` 所在层），`miniprogramRoot` 指向 `dist/`，先执行 `pnpm dev:weapp` 保持 watch 编译。默认 `MODE: 'mock'` 无需后端。
+
+> **若改动后模拟器表现异常（白屏等）**：先删 `dist/` 重新完整编译，再重启开发者工具。
+> 旧产物残留会令逻辑层加载失效代码。
+
+## 自动化测试
+
+```bash
+# 1. 以自动化端口打开项目（需先在工具「设置→安全设置」开启服务端口）
+& "C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat" auto --project <项目根目录> --auto-port 9420
+# 2. 另开终端运行（需已编译最新版到 dist/）
+pnpm build:weapp
+node scripts/e2e-mock.js
+```
+
+`scripts/e2e-mock.js` 覆盖 Mock 模式下的核心链路：首页按钮 → 结果页渲染/对错标记/低置信度提示 → 跳转讲解页 → AI 开局引导 → 快捷按钮追问 → 历史记录 → 错题 ID 约定与状态回写，共 12 项断言。
 
 ## 后端约定（API 模式）
 

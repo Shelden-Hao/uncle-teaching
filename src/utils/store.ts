@@ -60,12 +60,13 @@ export function getGradingRecord(id: string): GradingRecord | null {
 
 /* ---------- 错题记录 ---------- */
 
-export function saveWrongQuestions(gradingId: string, wrongList: Omit<WrongQuestion, 'id' | 'gradingId' | 'date' | 'photoUrl' | 'correctionStatus'>[]): void {
+export function saveWrongQuestions(gradingId: string, wrongList: (Omit<WrongQuestion, 'id' | 'gradingId' | 'date' | 'photoUrl' | 'correctionStatus'> & { no: string })[]): void {
   const list = getList<WrongQuestion>(KEY_WRONG)
   const date = new Date().toISOString().slice(0, 10)
   wrongList.forEach((w) => {
     list.unshift({
-      id: `${gradingId}-${list.length + 1}`,
+      // ID 约定：gradingId + 题号，tutor 页按同样约定回写订正状态
+      id: `${gradingId}-${w.no}`,
       gradingId,
       date,
       photoUrl: '',
