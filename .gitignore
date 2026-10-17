@@ -16,3 +16,6 @@ preview-qr.txt
 # 编辑器
 .idea/
 .vscode/
+
+# 开发者工具本地私有配置
+project.private.config.json

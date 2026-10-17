@@ -49,6 +49,7 @@ export default function Index() {
         saveWrongQuestions(
           gradingId,
           wrong.map((w) => ({
+            no: w.no,
             questionText: w.questionText,
             kidAnswer: w.kidAnswer,
             correctAnswer: w.correctAnswer,
