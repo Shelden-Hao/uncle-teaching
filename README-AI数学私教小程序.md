@@ -2,12 +2,14 @@
 
 对应产品文档：`PRD-AI数学私教-MVP.md`。核心链路：**孩子拍照 → AI 批改 → 点错题 → AI 分步讲解（不给答案）→ 错题落库**。
 
-## 技术栈
+## 技术栈与架构定位
 
-- **框架**：Taro v4.3.0（最新稳定版）+ React 18 + TypeScript + Sass
-- **目标端**：
-  - **H5（主目标）**：移动端 / 平板浏览器，`pnpm dev:h5`
-  - **微信小程序（快速验证）**：`pnpm dev:weapp`
+- **框架**：Taro v4.3.0 + **React 19** + TypeScript + Sass
+- **架构定位（重要）**：
+  - 本仓库 = **微信小程序 MVP**，唯一目的是快速验证产品思路，不追求长期演进；
+  - **最终移动端（移动 App / 平板）将使用 React Native 独立实现**，Taro 不承担该目标；
+  - 因此 `src/utils/` 下的业务逻辑层（AI 调用 `ai.ts`、存储 `store.ts`、知识点 `knowledge.ts`）必须保持**平台与框架无关**（纯 TS，仅通过 `@tarojs/taro` 的存储/请求 API 做薄封装），将来 RN 端只替换这层薄封装即可整体复用；
+  - 不要在 `src/pages/` 里写复杂业务逻辑，保持页面组件只做展示与交互编排。
 - **包管理**：pnpm
 
 ## 目录结构
@@ -34,8 +36,6 @@
 
 ```bash
 pnpm install          # 安装依赖
-pnpm dev:h5           # H5 开发（浏览器预览，主目标端）
-pnpm build:h5         # H5 生产构建 → dist/
 pnpm dev:weapp        # 小程序开发（配合微信开发者工具打开项目根目录）
 pnpm build:weapp      # 小程序生产构建 → dist/
 ```
