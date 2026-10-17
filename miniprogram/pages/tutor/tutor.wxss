@@ -1,0 +1,54 @@
+.chat {
+  height: calc(100vh - 240rpx);
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.bubble-wrap {
+  display: flex;
+  margin-bottom: 24rpx;
+}
+
+.bubble-wrap.me {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 75%;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  line-height: 1.5;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.bubble-wrap.me .bubble {
+  background: #FF8A3C;
+  color: #fff;
+}
+
+.quick {
+  display: flex;
+  gap: 16rpx;
+  padding: 12rpx 24rpx;
+}
+
+.quick .done {
+  background: #09BB07;
+  color: #fff;
+}
+
+.input-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+}
+
+.input-bar input {
+  flex: 1;
+  background: #F7F8FA;
+  border-radius: 12rpx;
+  padding: 16rpx;
+}

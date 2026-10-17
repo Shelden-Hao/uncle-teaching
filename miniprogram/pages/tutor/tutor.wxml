@@ -1,0 +1,18 @@
+<scroll-view class="chat" scroll-y scroll-into-view="{{scrollInto}}" scroll-with-animation>
+  <view wx:for="{{messages}}" wx:key="id" id="{{item.id}}"
+        class="bubble-wrap {{item.role === 'user' ? 'me' : ''}}">
+    <view class="bubble">{{item.content}}</view>
+  </view>
+</scroll-view>
+
+<view class="quick">
+  <button size="mini" bindtap="onQuick" data-type="hint">看一步提示</button>
+  <button size="mini" bindtap="onQuick" data-type="rephrase">换个说法</button>
+  <button size="mini" class="done" bindtap="onQuick" data-type="done">我会了！</button>
+</view>
+
+<view class="input-bar">
+  <input value="{{inputValue}}" bindinput="onInput" bindconfirm="onSend"
+         confirm-type="send" placeholder="输入你的想法…" />
+  <button size="mini" bindtap="onSend">发送</button>
+</view>
