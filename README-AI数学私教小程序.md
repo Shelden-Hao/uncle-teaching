@@ -1,103 +1,104 @@
-# AI 数学私教
+﻿# AI 鏁板绉佹暀
 
-对应产品文档：`PRD-AI数学私教-MVP.md`。核心链路：**孩子拍照 → AI 批改 → 点错题 → AI 分步讲解（不给答案）→ 错题落库**。
+瀵瑰簲浜у搧鏂囨。锛歚PRD-AI鏁板绉佹暀-MVP.md`銆傛牳蹇冮摼璺細**瀛╁瓙鎷嶇収 鈫?AI 鎵规敼 鈫?鐐归敊棰?鈫?AI 鍒嗘璁茶В锛堜笉缁欑瓟妗堬級鈫?閿欓钀藉簱**銆?
 
-## 技术栈与架构定位
+## 鎶€鏈爤涓庢灦鏋勫畾浣?
 
-- **框架**：Taro v4.3.0 + **React 18.3.1** + TypeScript + Sass
-- **⚠️ React 版本约束（重要）**：Taro 4.x 的小程序运行时依赖 React 18 内部 API（`ReactCurrentBatchConfig` 等），
-  **不支持 React 19**——实测升到 React 19 会导致小程序**白屏**（逻辑层报 `Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')`）。
-  因此本仓库锁定 React 18.3.1；**React 19 留给将来的 RN 端使用**（RN 新版基于 React 19，与本目标的最终架构一致）。
-  若后续 Taro 官方支持 React 19，再统一升级。
-- **架构定位（重要）**：
-  - 本仓库 = **微信小程序 MVP**，唯一目的是快速验证产品思路，不追求长期演进；
-  - **最终移动端（移动 App / 平板）将使用 React Native 独立实现**，Taro 不承担该目标；
-  - 因此 `src/utils/` 下的业务逻辑层（AI 调用 `ai.ts`、存储 `store.ts`、知识点 `knowledge.ts`）必须保持**平台与框架无关**（纯 TS，仅通过 `@tarojs/taro` 的存储/请求 API 做薄封装），将来 RN 端只替换这层薄封装即可整体复用；
-  - 不要在 `src/pages/` 里写复杂业务逻辑，保持页面组件只做展示与交互编排。
-- **包管理**：pnpm
+- **妗嗘灦**锛歍aro v4.3.0 + **React 18.3.1** + TypeScript + Sass
+- **鈿狅笍 React 鐗堟湰绾︽潫锛堥噸瑕侊級**锛歍aro 4.x 鐨勫皬绋嬪簭杩愯鏃朵緷璧?React 18 鍐呴儴 API锛坄ReactCurrentBatchConfig` 绛夛級锛?
+  **涓嶆敮鎸?React 19**鈥斺€斿疄娴嬪崌鍒?React 19 浼氬鑷村皬绋嬪簭**鐧藉睆**锛堥€昏緫灞傛姤 `Cannot read properties of undefined (reading 'ReactCurrentBatchConfig')`锛夈€?
+  鍥犳鏈粨搴撻攣瀹?React 18.3.1锛?*React 19 鐣欑粰灏嗘潵鐨?RN 绔娇鐢?*锛圧N 鏂扮増鍩轰簬 React 19锛屼笌鏈洰鏍囩殑鏈€缁堟灦鏋勪竴鑷达級銆?
+  鑻ュ悗缁?Taro 瀹樻柟鏀寔 React 19锛屽啀缁熶竴鍗囩骇銆?
+- **鏋舵瀯瀹氫綅锛堥噸瑕侊級**锛?
+  - 鏈粨搴?= **寰俊灏忕▼搴?MVP**锛屽敮涓€鐩殑鏄揩閫熼獙璇佷骇鍝佹€濊矾锛屼笉杩芥眰闀挎湡婕旇繘锛?
+  - **鏈€缁堢Щ鍔ㄧ锛堢Щ鍔?App / 骞虫澘锛夊皢浣跨敤 React Native 鐙珛瀹炵幇**锛孴aro 涓嶆壙鎷呰鐩爣锛?
+  - 鍥犳 `src/utils/` 涓嬬殑涓氬姟閫昏緫灞傦紙AI 璋冪敤 `ai.ts`銆佸瓨鍌?`store.ts`銆佺煡璇嗙偣 `knowledge.ts`锛夊繀椤讳繚鎸?*骞冲彴涓庢鏋舵棤鍏?*锛堢函 TS锛屼粎閫氳繃 `@tarojs/taro` 鐨勫瓨鍌?璇锋眰 API 鍋氳杽灏佽锛夛紝灏嗘潵 RN 绔彧鏇挎崲杩欏眰钖勫皝瑁呭嵆鍙暣浣撳鐢紱
+  - 涓嶈鍦?`src/pages/` 閲屽啓澶嶆潅涓氬姟閫昏緫锛屼繚鎸侀〉闈㈢粍浠跺彧鍋氬睍绀轰笌浜や簰缂栨帓銆?
+- **鍖呯鐞?*锛歱npm
 
-## 目录结构
+## 鐩綍缁撴瀯
 
 ```
-├── config/                  # Taro 构建配置（index/dev/prod）
-├── src/
-│   ├── app.ts / app.config.ts / app.scss
-│   ├── pages/
-│   │   ├── index/         # 首页：拍照上传 + 三入口（连击/勋章/报告）
-│   │   ├── result/        # 批改结果页：逐题 ✓/✗，低置信度标"待确认"
-│   │   ├── tutor/         # AI 讲解对话页："看一步提示/换个说法/我会了"
-│   │   ├── history/       # 历史批改记录
-│   │   ├── book/          # 错题本：统计 + 状态筛选 + 报告入口
-│   │   ├── wrong-detail/  # 错题详情：AI 再讲 + 变式练习（全对销号）
-│   │   ├── report/        # 学情报告：攻克率/周趋势/知识点掌握/家长建议
-│   │   ├── medals/        # 勋章墙：6 枚勋章 + 每周目标
-│   │   └── mental/        # 口算挑战：10 题限时，错题进错题本
-│   ├── utils/
-│   │   ├── config.ts       # ★ MODE: 'mock' | 'api' 切换
-│   │   ├── ai.ts           # 批改/讲解/变式生成/判答 + Prompt（含 Mock）
-│   │   ├── store.ts        # 存储：批改/错题/销号/掌握度/打卡/勋章/周目标
-│   │   ├── knowledge.ts    # 人教版五上知识点体系
-│   │   └── mental.ts       # 口算本地出题器（5 类题型）
-│   └── assets/icons/       # TabBar 图标
-├── scripts/
-│   ├── e2e-mock.js         # 主链路 e2e（29 项断言）
-│   └── e2e-mental.js       # 口算链路 e2e（11 项断言）
-└── project.config.json     # 微信开发者工具配置（miniprogramRoot: dist/）
+鈹溾攢鈹€ config/                  # Taro 鏋勫缓閰嶇疆锛坕ndex/dev/prod锛?
+鈹溾攢鈹€ src/
+鈹?  鈹溾攢鈹€ app.ts / app.config.ts / app.scss
+鈹?  鈹溾攢鈹€ pages/
+鈹?  鈹?  鈹溾攢鈹€ index/         # 棣栭〉锛氭媿鐓т笂浼?+ 涓夊叆鍙ｏ紙杩炲嚮/鍕嬬珷/鎶ュ憡锛?
+鈹?  鈹?  鈹溾攢鈹€ result/        # 鎵规敼缁撴灉椤碉細閫愰 鉁?鉁楋紝浣庣疆淇″害鏍?寰呯‘璁?
+鈹?  鈹?  鈹溾攢鈹€ tutor/         # AI 璁茶В瀵硅瘽椤碉細"鐪嬩竴姝ユ彁绀?鎹釜璇存硶/鎴戜細浜?
+鈹?  鈹?  鈹溾攢鈹€ history/       # 鍘嗗彶鎵规敼璁板綍
+鈹?  鈹?  鈹溾攢鈹€ book/          # 閿欓鏈細缁熻 + 鐘舵€佺瓫閫?+ 鎶ュ憡鍏ュ彛
+鈹?  鈹?  鈹溾攢鈹€ wrong-detail/  # 閿欓璇︽儏锛欰I 鍐嶈 + 鍙樺紡缁冧範锛堝叏瀵归攢鍙凤級
+鈹?  鈹?  鈹溾攢鈹€ report/        # 瀛︽儏鎶ュ憡锛氭敾鍏嬬巼/鍛ㄨ秼鍔?鐭ヨ瘑鐐规帉鎻?瀹堕暱寤鸿
+鈹?  鈹?  鈹溾攢鈹€ medals/        # 鍕嬬珷澧欙細6 鏋氬媼绔?+ 姣忓懆鐩爣
+鈹?  鈹?  鈹斺攢鈹€ mental/        # 鍙ｇ畻鎸戞垬锛?0 棰橀檺鏃讹紝閿欓杩涢敊棰樻湰
+鈹?  鈹溾攢鈹€ utils/
+鈹?  鈹?  鈹溾攢鈹€ config.ts       # 鈽?MODE: 'mock' | 'api' 鍒囨崲
+鈹?  鈹?  鈹溾攢鈹€ ai.ts           # 鎵规敼/璁茶В/鍙樺紡鐢熸垚/鍒ょ瓟 + Prompt锛堝惈 Mock锛?
+鈹?  鈹?  鈹溾攢鈹€ store.ts        # 瀛樺偍锛氭壒鏀?閿欓/閿€鍙?鎺屾彙搴?鎵撳崱/鍕嬬珷/鍛ㄧ洰鏍?
+鈹?  鈹?  鈹溾攢鈹€ knowledge.ts    # 浜烘暀鐗堜簲涓婄煡璇嗙偣浣撶郴
+鈹?  鈹?  鈹斺攢鈹€ mental.ts       # 鍙ｇ畻鏈湴鍑洪鍣紙5 绫婚鍨嬶級
+鈹?  鈹斺攢鈹€ assets/icons/       # TabBar 鍥炬爣
+鈹溾攢鈹€ scripts/
+鈹?  鈹溾攢鈹€ e2e-mock.js         # 涓婚摼璺?e2e锛?9 椤规柇瑷€锛?
+鈹?  鈹斺攢鈹€ e2e-mental.js       # 鍙ｇ畻閾捐矾 e2e锛?1 椤规柇瑷€锛?
+鈹斺攢鈹€ project.config.json     # 寰俊寮€鍙戣€呭伐鍏烽厤缃紙miniprogramRoot: dist/锛?
 ```
 
-## 常用命令
+## 甯哥敤鍛戒护
 
 ```bash
-pnpm install          # 安装依赖
-pnpm dev:weapp        # 小程序开发（配合微信开发者工具打开项目根目录）
-pnpm build:weapp      # 小程序生产构建 → dist/
+pnpm install          # 瀹夎渚濊禆
+pnpm dev:weapp        # 灏忕▼搴忓紑鍙戯紙閰嶅悎寰俊寮€鍙戣€呭伐鍏锋墦寮€椤圭洰鏍圭洰褰曪級
+pnpm build:weapp      # 灏忕▼搴忕敓浜ф瀯寤?鈫?dist/
 ```
 
-## 微信开发者工具联调
+## 寰俊寮€鍙戣€呭伐鍏疯仈璋?
 
-工具中「导入项目」选择**项目根目录**（`project.config.json` 所在层），`miniprogramRoot` 指向 `dist/`，先执行 `pnpm dev:weapp` 保持 watch 编译。默认 `MODE: 'mock'` 无需后端。
+宸ュ叿涓€屽鍏ラ」鐩€嶉€夋嫨**椤圭洰鏍圭洰褰?*锛坄project.config.json` 鎵€鍦ㄥ眰锛夛紝`miniprogramRoot` 鎸囧悜 `dist/`锛屽厛鎵ц `pnpm dev:weapp` 淇濇寔 watch 缂栬瘧銆傞粯璁?`MODE: 'mock'` 鏃犻渶鍚庣銆?
 
-> **若改动后模拟器表现异常（白屏等）**：先删 `dist/` 重新完整编译，再重启开发者工具。
-> 旧产物残留会令逻辑层加载失效代码。
+> **鑻ユ敼鍔ㄥ悗妯℃嫙鍣ㄨ〃鐜板紓甯革紙鐧藉睆绛夛級**锛氬厛鍒?`dist/` 閲嶆柊瀹屾暣缂栬瘧锛屽啀閲嶅惎寮€鍙戣€呭伐鍏枫€?
+> 鏃т骇鐗╂畫鐣欎細浠ら€昏緫灞傚姞杞藉け鏁堜唬鐮併€?
 
-## 自动化测试
+## 鑷姩鍖栨祴璇?
 
 ```bash
-# 1. 以自动化端口打开项目（需先在工具「设置→安全设置」开启服务端口）
-& "C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat" auto --project <项目根目录> --auto-port 9420
-# 2. 另开终端运行（需已编译最新版到 dist/）
+# 1. 浠ヨ嚜鍔ㄥ寲绔彛鎵撳紑椤圭洰锛堥渶鍏堝湪宸ュ叿銆岃缃啋瀹夊叏璁剧疆銆嶅紑鍚湇鍔＄鍙ｏ級
+& "C:\Program Files (x86)\Tencent\寰俊web寮€鍙戣€呭伐鍏穃cli.bat" auto --project <椤圭洰鏍圭洰褰? --auto-port 9420
+# 2. 鍙﹀紑缁堢杩愯锛堥渶宸茬紪璇戞渶鏂扮増鍒?dist/锛?
 pnpm build:weapp
 node scripts/e2e-mock.js
 ```
 
-`scripts/e2e-mock.js` 覆盖 Mock 模式下的完整产品闭环（29 项断言）：拍照批改 → 结果页 → AI 讲解对话 → 错题本（统计/筛选）→ 错题详情 + 变式练习销号 → 学情报告 → 勋章墙。
-`scripts/e2e-mental.js` 覆盖口算挑战完整链路（11 项断言）：出题 → 答题 → 交卷 → 错题自动入错题本 → 逐题回顾。
+`scripts/e2e-mock.js` 瑕嗙洊 Mock 妯″紡涓嬬殑瀹屾暣浜у搧闂幆锛?9 椤规柇瑷€锛夛細鎷嶇収鎵规敼 鈫?缁撴灉椤?鈫?AI 璁茶В瀵硅瘽 鈫?閿欓鏈紙缁熻/绛涢€夛級鈫?閿欓璇︽儏 + 鍙樺紡缁冧範閿€鍙?鈫?瀛︽儏鎶ュ憡 鈫?鍕嬬珷澧欍€?
+`scripts/e2e-mental.js` 瑕嗙洊鍙ｇ畻鎸戞垬瀹屾暣閾捐矾锛?1 椤规柇瑷€锛夛細鍑洪 鈫?绛旈 鈫?浜ゅ嵎 鈫?閿欓鑷姩鍏ラ敊棰樻湰 鈫?閫愰鍥為【銆?
 
 ```bash
-node scripts/e2e-mock.js    # 主链路
-node scripts/e2e-mental.js  # 口算链路
+node scripts/e2e-mock.js    # 涓婚摼璺?
+node scripts/e2e-mental.js  # 鍙ｇ畻閾捐矾
 ```
 
-## 后端约定（API 模式）
+## 鍚庣绾﹀畾锛圓PI 妯″紡锛?
 
-API Key 一律放服务端。需实现两个接口（详见 `src/utils/ai.ts`）：
+API Key 涓€寰嬫斁鏈嶅姟绔€傞渶瀹炵幇涓や釜鎺ュ彛锛堣瑙?`src/utils/ai.ts`锛夛細
 
-- `POST /grade` — `{ images: [base64...] }` → `{ items: [{no, questionText, kidAnswer, correctAnswer, isCorrect, knowledgePoint, confidence}] }`
-- `POST /chat` — `{ messages: [...] }` → `{ reply }`（System Prompt 见 `TUTOR_SYSTEM_PROMPT`）
+- `POST /grade` 鈥?`{ images: [base64...] }` 鈫?`{ items: [{no, questionText, kidAnswer, correctAnswer, isCorrect, knowledgePoint, confidence}] }`
+- `POST /chat` 鈥?`{ messages: [...] }` 鈫?`{ reply }`锛圫ystem Prompt 瑙?`TUTOR_SYSTEM_PROMPT`锛?
 
-## Git 工作流规范
+## Git 宸ヤ綔娴佽鑼?
 
-见 `CONTRIBUTING.md`。要点：任何修改（含小 bug）都必须走 Git 流程——独立分支 + 规范化 commit message + 合并回 master。
+瑙?`CONTRIBUTING.md`銆傝鐐癸細浠讳綍淇敼锛堝惈灏?bug锛夐兘蹇呴』璧?Git 娴佺▼鈥斺€旂嫭绔嬪垎鏀?+ 瑙勮寖鍖?commit message + 鍚堝苟鍥?master銆?
 
-## MVP 验证指标
+## MVP 楠岃瘉鎸囨爣
 
-- 题目级批改准确率 ≥ 90%
-- 讲解后订正通过率 ≥ 70%
-- 孩子每周主动使用 ≥ 4 天
+- 棰樼洰绾ф壒鏀瑰噯纭巼 鈮?90%
+- 璁茶В鍚庤姝ｉ€氳繃鐜?鈮?70%
+- 瀛╁瓙姣忓懆涓诲姩浣跨敤 鈮?4 澶?
 
-## 后续方向（MVP 已闭环，见 ROADMAP.md）
+## 鍚庣画鏂瑰悜锛圡VP 宸查棴鐜紝瑙?ROADMAP.md锛?
 
-1. **接真实 AI**：`MODE: 'api'` + 极简后端——批改识别率是产品命门，优先做
-2. 错题打印导出（家长线下辅导场景）
-3. 变式题难度自适应
-4. 多设备同步（当前单设备存储）
+1. **鎺ョ湡瀹?AI**锛歚MODE: 'api'` + 鏋佺畝鍚庣鈥斺€旀壒鏀硅瘑鍒巼鏄骇鍝佸懡闂紝浼樺厛鍋?
+2. 閿欓鎵撳嵃瀵煎嚭锛堝闀跨嚎涓嬭緟瀵煎満鏅級
+3. 鍙樺紡棰橀毦搴﹁嚜閫傚簲
+4. 澶氳澶囧悓姝ワ紙褰撳墠鍗曡澶囧瓨鍌級
+

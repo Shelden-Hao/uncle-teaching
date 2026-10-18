@@ -1,5 +1,6 @@
 import Taro from '@tarojs/taro'
-import { MODE, API_BASE } from './config'
+import { MODE, API_BASE, DEEPSEEK_BASE, DEEPSEEK_CHAT_MODEL, DEEPSEEK_VISION_MODEL } from './config'
+import { DEEPSEEK_API_KEY } from './secret'
 import { KNOWLEDGE_PROMPT } from './knowledge'
 
 /* ---------- 类型定义 ---------- */
@@ -93,14 +94,80 @@ const MOCK_CHAT_REPLY = '我们先把题目读一遍：这道题已知哪两个�
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+/** DeepSeek chat completions 直连（文本 + 可选图片 base64） */
+async function deepseekChat(
+  messages: Array<{ role: string; content: string | Array<Record<string, unknown>> }>,
+  model: string = DEEPSEEK_CHAT_MODEL,
+  jsonResponse = false
+): Promise<string> {
+  // deepseek-flash 系推理模型：批改整页照片的推理+输出可能耗 8k+ tokens，须给足 max_tokens
+  const needBigBudget = model === DEEPSEEK_VISION_MODEL
+  const res = await Taro.request({
+    url: `${DEEPSEEK_BASE}/chat/completions`,
+    method: 'POST',
+    header: {
+      Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      model,
+      messages,
+      ...(jsonResponse ? { response_format: { type: 'json_object' } } : {}),
+      max_tokens: needBigBudget ? 16000 : 2000,
+      temperature: 0.3 // 批改/出题要稳定，低温
+    },
+    timeout: 120000
+  })
+  if (res.statusCode !== 200) {
+    throw new Error(`DeepSeek HTTP ${res.statusCode}: ${JSON.stringify(res.data).slice(0, 200)}`)
+  }
+  const data = res.data as {
+    choices: Array<{ message: { content: string; reasoning_content?: string } }>
+  }
+  const text = data.choices[0].message.content
+  if (!text || !text.trim()) {
+    throw new Error('AI 返回为空（token 预算不足或服务波动），请重试')
+  }
+  return text
+}
+
+/** 从模型回复中提取 JSON（容错处理 markdown 代码块） */
+function extractJson<T>(text: string): T {
+  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+  const start = cleaned.indexOf('{')
+  const end = cleaned.lastIndexOf('}')
+  if (start === -1 || end === -1) throw new Error('模型未返回 JSON：' + text.slice(0, 120))
+  return JSON.parse(cleaned.slice(start, end + 1)) as T
+}
+
 /** 批改：images 为本地图片路径数组 */
 export async function grade(images: string[]): Promise<GradeResult> {
   if (MODE === 'mock') {
     await delay(600)
     return mockGradeResult()
   }
+  if (MODE === 'api') {
+    const bases = await Promise.all(images.map(toBase64))
+    return post<GradeResult>('/grade', { images: bases })
+  }
+
+  // deepseek 直连：多模态消息（image_url 携带 base64 data URL）
+  const content: Array<Record<string, unknown>> = [
+    { type: 'text', text: GRADE_SYSTEM_PROMPT + '\n\n请批改这张作业照片，严格按系统要求输出 JSON。' }
+  ]
   const bases = await Promise.all(images.map(toBase64))
-  return post<GradeResult>('/grade', { images: bases })
+  bases.forEach((b) => {
+    content.push({ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${b}` } })
+  })
+
+  const reply = await deepseekChat(
+    [{ role: 'user', content }],
+    DEEPSEEK_VISION_MODEL,
+    true
+  )
+  const parsed = extractJson<GradeResult>(reply)
+  if (!parsed.items || !Array.isArray(parsed.items)) throw new Error('批改结果格式异常')
+  return parsed
 }
 
 /** 讲解对话：返回 { reply } */
@@ -113,7 +180,13 @@ export async function chat(history: ChatMessage[], wrongItem: GradeItem): Promis
     role: 'system',
     content: `${TUTOR_SYSTEM_PROMPT}\n当前错题：${JSON.stringify(wrongItem)}`
   }
-  return post<{ reply: string }>('/chat', { messages: [sys, ...history] })
+  if (MODE === 'api') {
+    return post<{ reply: string }>('/chat', { messages: [sys, ...history] })
+  }
+
+  // deepseek 直连
+  const reply = await deepseekChat([sys, ...history])
+  return { reply }
 }
 
 /**
@@ -142,8 +215,19 @@ export async function generateVariants(wrongItem: GradeItem): Promise<VariantQue
 只输出 JSON：{"items":[{"no":1,"questionText":"...","correctAnswer":"...","knowledgePoint":"..."}]}
 错题：${JSON.stringify(wrongItem)}`
   }
-  const res = await post<{ items: VariantQuestion[] }>('/chat', { messages: [sys, { role: 'user', content: '请生成变式题。' }] })
-  return res.items
+  if (MODE === 'api') {
+    const res = await post<{ items: VariantQuestion[] }>('/chat', { messages: [sys, { role: 'user', content: '请生成变式题。' }] })
+    return res.items
+  }
+
+  // deepseek 直连
+  const reply = await deepseekChat(
+    [sys, { role: 'user', content: '请生成变式题。' }],
+    DEEPSEEK_CHAT_MODEL,
+    true
+  )
+  const parsed = extractJson<{ items: VariantQuestion[] }>(reply)
+  return parsed.items || []
 }
 
 /** 判定变式题作答（api 模式由后端判；mock 模式本地精确匹配） */
@@ -162,9 +246,20 @@ export async function checkVariantAnswer(q: VariantQuestion, answer: string): Pr
     content: `你是小学数学老师。判定学生答案是否正确。
 题目：${JSON.stringify(q)}
 学生答案：${answer}
-只输出 JSON：{"correct":true/false,"hint":"一句话反馈，错则给方向性提示不直接说答案"}`
+只输出 JSON：{"correct":true/false,"hint":"一句话反馈"}
+hint 铁律：对了就表扬；错了只指方向（如"检查小数点对齐了吗"），绝不包含正确答案或计算过程。`
   }
-  return post<{ correct: boolean; hint: string }>('/chat', { messages: [sys, { role: 'user', content: '请判定。' }] })
+  if (MODE === 'api') {
+    return post<{ correct: boolean; hint: string }>('/chat', { messages: [sys, { role: 'user', content: '请判定。' }] })
+  }
+
+  // deepseek 直连
+  const reply = await deepseekChat(
+    [sys, { role: 'user', content: '请判定。' }],
+    DEEPSEEK_CHAT_MODEL,
+    true
+  )
+  return extractJson<{ correct: boolean; hint: string }>(reply)
 }
 
 /* ---------- 内部工具 ---------- */

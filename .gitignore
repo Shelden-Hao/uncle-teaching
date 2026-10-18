@@ -19,3 +19,7 @@ preview-qr.txt
 
 # 开发者工具本地私有配置
 project.private.config.json
+
+# 敏感配置（API Key）——绝不提交 Git
+src/utils/secret.ts
+.env*
