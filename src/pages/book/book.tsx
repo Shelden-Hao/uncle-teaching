@@ -29,6 +29,12 @@ export default function Book() {
 
   return (
     <View className="book">
+      <View className="report-entry card" onClick={() => Taro.navigateTo({ url: '/pages/report/report' })}>
+        <Text className="re-title">📊 学情报告</Text>
+        <Text className="re-sub">掌握度 · 周趋势 · 给家长的建议</Text>
+        <Text className="re-arrow">›</Text>
+      </View>
+
       <View className="stat-bar card">
         <View className="stat-item">
           <Text className="num">{wrongs.length}</Text>

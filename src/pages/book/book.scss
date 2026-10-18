@@ -1,3 +1,27 @@
+.report-entry {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff4ea;
+}
+
+.re-title {
+  font-weight: 600;
+  font-size: 30px;
+  color: #b26a00;
+}
+
+.re-sub {
+  color: #c99a5e;
+  font-size: 24px;
+  flex: 1;
+}
+
+.re-arrow {
+  color: #c99a5e;
+  font-size: 40px;
+}
+
 .stat-bar {
   display: flex;
 }

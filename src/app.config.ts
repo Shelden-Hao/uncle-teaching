@@ -5,7 +5,8 @@ export default defineAppConfig({
     'pages/tutor/tutor',
     'pages/history/history',
     'pages/book/book',
-    'pages/wrong-detail/wrong-detail'
+    'pages/wrong-detail/wrong-detail',
+    'pages/report/report'
   ],
   window: {
     navigationBarBackgroundColor: '#FF8A3C',

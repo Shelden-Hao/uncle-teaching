@@ -1,0 +1,168 @@
+.overall {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.mastery-ring {
+  display: flex;
+  align-items: baseline;
+}
+
+.mastery-num {
+  font-size: 88px;
+  font-weight: 700;
+  color: #ff8a3c;
+}
+
+.mastery-unit {
+  color: #999;
+  font-size: 28px;
+  margin-left: 8px;
+}
+
+.overall-desc .title {
+  display: block;
+  font-weight: 600;
+  font-size: 32px;
+}
+
+.overall-desc .sub {
+  display: block;
+  color: #999;
+  font-size: 26px;
+  margin-top: 12px;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 20px;
+  font-size: 30px;
+}
+
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.kv-label {
+  color: #666;
+  font-size: 28px;
+}
+
+.kv-value {
+  font-weight: 600;
+}
+
+.trend-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.trend-col {
+  flex: 1;
+  text-align: center;
+}
+
+.trend-num {
+  display: block;
+  font-size: 56px;
+  font-weight: 700;
+}
+
+.trend-label {
+  color: #999;
+  font-size: 24px;
+}
+
+.trend-arrow {
+  color: #999;
+  font-size: 26px;
+}
+
+.kp-row {
+  margin-bottom: 28px;
+}
+
+.kp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kp-name {
+  font-size: 27px;
+  line-height: 1.4;
+}
+
+.kp-score {
+  font-weight: 700;
+  font-size: 32px;
+}
+
+.kp-score.good {
+  color: #09bb07;
+}
+
+.kp-score.mid {
+  color: #f0a020;
+}
+
+.kp-score.bad {
+  color: #e64340;
+}
+
+.bar {
+  height: 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+}
+
+.bar-fill.good {
+  background: #09bb07;
+}
+
+.bar-fill.mid {
+  background: #f0a020;
+}
+
+.bar-fill.bad {
+  background: #e64340;
+}
+
+.kp-sub {
+  display: block;
+  color: #999;
+  font-size: 24px;
+  margin-top: 6px;
+}
+
+.empty-line {
+  color: #999;
+  font-size: 26px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.advice {
+  background: #fff7e8;
+}
+
+.advice .section-title {
+  color: #b26a00;
+}
+
+.advice-text {
+  color: #7a4a00;
+  font-size: 27px;
+  line-height: 1.6;
+}

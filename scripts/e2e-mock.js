@@ -214,6 +214,27 @@ async function main() {
   })
   log('打卡数据读写正常', checkin.days >= 1 && checkin.total >= 3, `days=${checkin.days} total=${checkin.total}`)
 
+  // ===== 11. 学情报告页 =====
+  page = await miniProgram.reLaunch('/pages/report/report')
+  await page.waitFor(1500)
+  const masteryNum = await page.$('.mastery-num')
+  const masteryVal = masteryNum ? String(await masteryNum.wxml()) : ''
+  // 2 道错题（g1 已销号 1 道：gtest001-3 销号后），攻克率应为 50
+  log('报告页攻克率渲染', /\d+/.test(masteryVal), `攻克率=${masteryVal}`)
+  const kpRows = await page.$$('.kp-row')
+  log('知识点掌握列表渲染', kpRows.length >= 1, `知识点 ${kpRows.length} 行`)
+  const adviceEl = await page.$('.advice-text')
+  const adviceTxt = adviceEl ? String(await adviceEl.wxml()) : ''
+  log('家长建议渲染', adviceTxt.length > 5, adviceTxt.slice(0, 40))
+  const trendNums = await page.$$('.trend-num')
+  log('周趋势渲染', trendNums.length === 2, `趋势数字 ${trendNums.length} 个`)
+
+  // 报告入口（错题本页）
+  page = await miniProgram.reLaunch('/pages/book/book')
+  await page.waitFor(1000)
+  const reportEntry = await page.$('.report-entry')
+  log('报告入口存在', !!reportEntry)
+
   // ===== 清理测试数据 =====
   await miniProgram.evaluate(function () {
     wx.removeStorageSync('grading_records')
