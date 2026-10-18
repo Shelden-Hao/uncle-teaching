@@ -90,6 +90,84 @@ export function updateWrongStatus(id: string, status: CorrectionStatus): void {
   }
 }
 
+/** 错题销号：变式全部做对后调用；销号即"订正通过" */
+export function retireWrongQuestion(id: string): void {
+  updateWrongStatus(id, '订正通过')
+}
+
+/** 错题统计：按知识点聚合并计算掌握度（销号率） */
+export interface KnowledgeStat {
+  knowledgePoint: string
+  total: number
+  retired: number
+  mastery: number // 0-100
+}
+
+export function getKnowledgeStats(): KnowledgeStat[] {
+  const wrongs = listWrongQuestions()
+  const map = new Map<string, { total: number; retired: number }>()
+  wrongs.forEach((w) => {
+    const key = w.knowledgePoint || '未分类'
+    const entry = map.get(key) || { total: 0, retired: 0 }
+    entry.total += 1
+    if (w.correctionStatus === '订正通过') entry.retired += 1
+    map.set(key, entry)
+  })
+  return Array.from(map.entries())
+    .map(([knowledgePoint, v]) => ({
+      knowledgePoint,
+      total: v.total,
+      retired: v.retired,
+      mastery: v.total ? Math.round((v.retired / v.total) * 100) : 0
+    }))
+    .sort((a, b) => a.mastery - b.mastery) // 最薄弱的排最前
+}
+
+/* ---------- 学习打卡（激励体系数据层） ---------- */
+
+const KEY_CHECKIN = 'checkin_days'
+
+export interface CheckinData {
+  days: string[] // YYYY-MM-DD 列表
+  totalGraded: number // 累计批改题数
+}
+
+function getCheckin(): CheckinData {
+  return (Taro.getStorageSync(KEY_CHECKIN) as CheckinData) || { days: [], totalGraded: 0 }
+}
+
+/** 记录一次学习（当天算打卡日）；totalGradedDelta 为本次批改题数 */
+export function recordStudy(totalGradedDelta: number): void {
+  const data = getCheckin()
+  const today = new Date().toISOString().slice(0, 10)
+  if (!data.days.includes(today)) {
+    data.days.push(today)
+    data.days.sort()
+  }
+  data.totalGraded += totalGradedDelta
+  Taro.setStorageSync(KEY_CHECKIN, data)
+}
+
+export function getCheckinData(): CheckinData {
+  return getCheckin()
+}
+
+/** 连续打卡天数（含今天或昨天截止） */
+export function getStreak(): number {
+  const days = getCheckin().days
+  if (!days.length) return 0
+  const set = new Set(days)
+  let streak = 0
+  const d = new Date()
+  // 今天没学不打断连击，从昨天开始数
+  if (!set.has(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1)
+  while (set.has(d.toISOString().slice(0, 10))) {
+    streak += 1
+    d.setDate(d.getDate() - 1)
+  }
+  return streak
+}
+
 /* ---------- 图片缓存清理 ---------- */
 
 export function cleanOldPhotos(days: number): void {

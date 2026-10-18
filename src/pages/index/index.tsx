@@ -2,19 +2,21 @@ import { useState } from 'react'
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { grade } from '../../utils/ai'
-import { saveGradingRecord, saveWrongQuestions, listGradingRecords } from '../../utils/store'
+import { saveGradingRecord, saveWrongQuestions, listGradingRecords, recordStudy, getStreak } from '../../utils/store'
 import './index.scss'
 
 export default function Index() {
   const [todayTotal, setTodayTotal] = useState(0)
   const [todayWrong, setTodayWrong] = useState(0)
   const [lastPhoto, setLastPhoto] = useState('')
+  const [streak, setStreak] = useState(0)
 
   useDidShow(() => {
     const today = new Date().toISOString().slice(0, 10)
     const todayRecs = listGradingRecords().filter((r) => r.date === today)
     setTodayTotal(todayRecs.reduce((s, r) => s + r.total, 0))
     setTodayWrong(todayRecs.reduce((s, r) => s + r.wrong, 0))
+    setStreak(getStreak())
   })
 
   /** 主入口：拍照或从相册选择（1~3 张） */
@@ -58,6 +60,7 @@ export default function Index() {
           }))
         )
       }
+      recordStudy(items.length) // 打卡 + 累计题数
 
       Taro.navigateTo({ url: `/pages/result/result?id=${gradingId}` })
     } catch (e) {
@@ -89,6 +92,10 @@ export default function Index() {
         <View className="stat">
           <View className="num warn">{todayWrong}</View>
           <View className="label">今日错题</View>
+        </View>
+        <View className="stat">
+          <View className="num fire">{streak > 0 ? `${streak}🔥` : '0'}</View>
+          <View className="label">连续打卡</View>
         </View>
       </View>
 
