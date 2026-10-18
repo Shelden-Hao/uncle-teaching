@@ -235,6 +235,18 @@ async function main() {
   const reportEntry = await page.$('.report-entry')
   log('报告入口存在', !!reportEntry)
 
+  // ===== 12. 勋章页 =====
+  page = await miniProgram.reLaunch('/pages/medals/medals')
+  await page.waitFor(1200)
+  const medalItems = await page.$$('.medal')
+  log('勋章墙渲染 6 枚', medalItems.length === 6, `实际 ${medalItems.length} 枚`)
+  const earnedMedals = await page.$$('.medal.earned')
+  log('已获得勋章渲染', earnedMedals.length >= 2, `获得 ${earnedMedals.length} 枚`)
+  const streakNum = await page.$('.streak-num')
+  log('连续打卡展示', !!streakNum)
+  const goalFill = await page.$('.goal-fill')
+  log('本周目标进度条渲染', !!goalFill)
+
   // ===== 清理测试数据 =====
   await miniProgram.evaluate(function () {
     wx.removeStorageSync('grading_records')
