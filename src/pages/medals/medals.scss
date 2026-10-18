@@ -1,0 +1,121 @@
+.hero {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.streak-num {
+  font-size: 96px;
+  font-weight: 700;
+  color: #ff8a3c;
+}
+
+.streak-label {
+  display: block;
+  color: #999;
+  font-size: 26px;
+  margin-top: 4px;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 24px;
+}
+
+.hs {
+  color: #666;
+  font-size: 26px;
+}
+
+.goal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.goal-title {
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.goal-adjust {
+  display: flex;
+  gap: 12px;
+
+  button::after {
+    border: none;
+  }
+}
+
+.goal-bar {
+  height: 16px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin: 20px 0 12px;
+  overflow: hidden;
+}
+
+.goal-fill {
+  height: 100%;
+  background: #ff8a3c;
+  border-radius: 8px;
+  transition: width 0.3s;
+}
+
+.goal-fill.done {
+  background: #09bb07;
+}
+
+.goal-status {
+  color: #666;
+  font-size: 26px;
+}
+
+.sec-title {
+  font-weight: 600;
+  font-size: 30px;
+  margin-bottom: 24px;
+}
+
+.medal-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.medal {
+  width: calc((100% - 40px) / 3);
+  background: #fafafa;
+  border-radius: 16px;
+  padding: 20px 12px;
+  text-align: center;
+}
+
+.medal.earned {
+  background: #fff4ea;
+}
+
+.medal.locked {
+  opacity: 0.55;
+}
+
+.m-icon {
+  display: block;
+  font-size: 48px;
+}
+
+.m-name {
+  display: block;
+  font-weight: 600;
+  font-size: 26px;
+  margin-top: 8px;
+}
+
+.m-desc {
+  display: block;
+  color: #999;
+  font-size: 20px;
+  margin-top: 6px;
+  line-height: 1.4;
+}

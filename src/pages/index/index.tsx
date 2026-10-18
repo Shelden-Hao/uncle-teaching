@@ -85,17 +85,17 @@ export default function Index() {
       </Button>
 
       <View className="card stats">
-        <View className="stat">
-          <View className="num">{todayTotal}</View>
-          <View className="label">今日批改</View>
-        </View>
-        <View className="stat">
-          <View className="num warn">{todayWrong}</View>
-          <View className="label">今日错题</View>
-        </View>
-        <View className="stat">
+        <View className="stat" onClick={() => Taro.navigateTo({ url: '/pages/medals/medals' })}>
           <View className="num fire">{streak > 0 ? `${streak}🔥` : '0'}</View>
-          <View className="label">连续打卡</View>
+          <View className="label">连续打卡 ›</View>
+        </View>
+        <View className="stat" onClick={() => Taro.navigateTo({ url: '/pages/medals/medals' })}>
+          <View className="num">🏅</View>
+          <View className="label">我的勋章 ›</View>
+        </View>
+        <View className="stat" onClick={() => Taro.navigateTo({ url: '/pages/report/report' })}>
+          <View className="num">📊</View>
+          <View className="label">学情报告 ›</View>
         </View>
       </View>
 

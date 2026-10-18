@@ -168,6 +168,65 @@ export function getStreak(): number {
   return streak
 }
 
+/* ---------- 激励体系：勋章 + 每周目标 ---------- */
+
+export interface Medal {
+  id: string
+  name: string
+  desc: string
+  icon: string
+  earned: boolean
+}
+
+/** 勋章定义与达成判定（只奖励"学会"，不奖励刷题量） */
+export function getMedals(): Medal[] {
+  const ck = getCheckin()
+  const wrongs = listWrongQuestions()
+  const retired = wrongs.filter((w) => w.correctionStatus === '订正通过').length
+  const streak = getStreak()
+  const perfectRecords = listGradingRecords().filter((r) => r.total > 0 && r.wrong === 0).length
+
+  return [
+    { id: 'first-graded', name: '第一次批改', desc: '完成第一次拍照批改', icon: '📷', earned: ck.totalGraded >= 1 },
+    { id: 'first-retire', name: '首题销号', desc: '第一道错题变式全对销号', icon: '🎯', earned: retired >= 1 },
+    { id: 'streak-3', name: '三日之约', desc: '连续打卡 3 天', icon: '🔥', earned: streak >= 3 },
+    { id: 'streak-7', name: '一周坚持', desc: '连续打卡 7 天', icon: '⚡', earned: streak >= 7 },
+    { id: 'retire-10', name: '攻克十题', desc: '累计销号 10 道错题', icon: '🏅', earned: retired >= 10 },
+    { id: 'perfect-paper', name: '满分小达人', desc: '一次批改全对', icon: '🌟', earned: perfectRecords >= 1 }
+  ]
+}
+
+const KEY_WEEK_GOAL = 'week_goal'
+
+export interface WeekGoal {
+  targetDays: number // 每周目标学习天数
+}
+
+export function getWeekGoal(): WeekGoal {
+  return (Taro.getStorageSync(KEY_WEEK_GOAL) as WeekGoal) || { targetDays: 5 }
+}
+
+export function setWeekGoal(targetDays: number): void {
+  Taro.setStorageSync(KEY_WEEK_GOAL, { targetDays })
+}
+
+/** 本周（周一起）已学习天数 */
+export function getThisWeekDays(): number {
+  const days = new Set(getCheckin().days)
+  const now = new Date()
+  const day = now.getDay() || 7 // 周一=1...周日=7
+  const monday = new Date(now)
+  monday.setDate(now.getDate() - day + 1)
+  let count = 0
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday)
+    d.setDate(monday.getDate() + i)
+    if (d > now) break
+    if (days.has(d.toISOString().slice(0, 10))) count += 1
+  }
+  return count
+}
+
 /* ---------- 图片缓存清理 ---------- */
 
 export function cleanOldPhotos(days: number): void {
