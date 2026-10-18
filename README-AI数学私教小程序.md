@@ -23,16 +23,25 @@
 ├── src/
 │   ├── app.ts / app.config.ts / app.scss
 │   ├── pages/
-│   │   ├── index/     # 首页：拍照上传 + 今日统计
-│   │   ├── result/    # 批改结果页：逐题 ✓/✗，低置信度标"待确认"
-│   │   ├── tutor/     # AI 讲解对话页："看一步提示/换个说法/我会了"
-│   │   └── history/   # 历史批改记录
+│   │   ├── index/         # 首页：拍照上传 + 三入口（连击/勋章/报告）
+│   │   ├── result/        # 批改结果页：逐题 ✓/✗，低置信度标"待确认"
+│   │   ├── tutor/         # AI 讲解对话页："看一步提示/换个说法/我会了"
+│   │   ├── history/       # 历史批改记录
+│   │   ├── book/          # 错题本：统计 + 状态筛选 + 报告入口
+│   │   ├── wrong-detail/  # 错题详情：AI 再讲 + 变式练习（全对销号）
+│   │   ├── report/        # 学情报告：攻克率/周趋势/知识点掌握/家长建议
+│   │   ├── medals/        # 勋章墙：6 枚勋章 + 每周目标
+│   │   └── mental/        # 口算挑战：10 题限时，错题进错题本
 │   ├── utils/
 │   │   ├── config.ts       # ★ MODE: 'mock' | 'api' 切换
-│   │   ├── ai.ts           # 批改/讲解调用层 + Prompt（含 Mock）
-│   │   ├── store.ts        # 本地存储：grading_record / wrong_question
-│   │   └── knowledge.ts    # 人教版五上知识点体系
+│   │   ├── ai.ts           # 批改/讲解/变式生成/判答 + Prompt（含 Mock）
+│   │   ├── store.ts        # 存储：批改/错题/销号/掌握度/打卡/勋章/周目标
+│   │   ├── knowledge.ts    # 人教版五上知识点体系
+│   │   └── mental.ts       # 口算本地出题器（5 类题型）
 │   └── assets/icons/       # TabBar 图标
+├── scripts/
+│   ├── e2e-mock.js         # 主链路 e2e（29 项断言）
+│   └── e2e-mental.js       # 口算链路 e2e（11 项断言）
 └── project.config.json     # 微信开发者工具配置（miniprogramRoot: dist/）
 ```
 
@@ -61,7 +70,13 @@ pnpm build:weapp
 node scripts/e2e-mock.js
 ```
 
-`scripts/e2e-mock.js` 覆盖 Mock 模式下的核心链路：首页按钮 → 结果页渲染/对错标记/低置信度提示 → 跳转讲解页 → AI 开局引导 → 快捷按钮追问 → 历史记录 → 错题 ID 约定与状态回写，共 12 项断言。
+`scripts/e2e-mock.js` 覆盖 Mock 模式下的完整产品闭环（29 项断言）：拍照批改 → 结果页 → AI 讲解对话 → 错题本（统计/筛选）→ 错题详情 + 变式练习销号 → 学情报告 → 勋章墙。
+`scripts/e2e-mental.js` 覆盖口算挑战完整链路（11 项断言）：出题 → 答题 → 交卷 → 错题自动入错题本 → 逐题回顾。
+
+```bash
+node scripts/e2e-mock.js    # 主链路
+node scripts/e2e-mental.js  # 口算链路
+```
 
 ## 后端约定（API 模式）
 
@@ -80,9 +95,9 @@ API Key 一律放服务端。需实现两个接口（详见 `src/utils/ai.ts`）
 - 讲解后订正通过率 ≥ 70%
 - 孩子每周主动使用 ≥ 4 天
 
-## 二期待办
+## 后续方向（MVP 已闭环，见 ROADMAP.md）
 
-- 错题本 UI、变式题推送（数据已落库）
-- 家长周报、掌握度雷达图
-- 图片长期保存（当前临时路径）
-- 订正通过状态回写（当前仅在对话中验证）
+1. **接真实 AI**：`MODE: 'api'` + 极简后端——批改识别率是产品命门，优先做
+2. 错题打印导出（家长线下辅导场景）
+3. 变式题难度自适应
+4. 多设备同步（当前单设备存储）
