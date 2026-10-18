@@ -7,7 +7,8 @@ export default defineAppConfig({
     'pages/book/book',
     'pages/wrong-detail/wrong-detail',
     'pages/report/report',
-    'pages/medals/medals'
+    'pages/medals/medals',
+    'pages/mental/mental'
   ],
   window: {
     navigationBarBackgroundColor: '#FF8A3C',

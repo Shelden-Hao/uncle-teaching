@@ -84,6 +84,10 @@ export default function Index() {
         📷 拍照批改
       </Button>
 
+      <Button className="btn-secondary mental-btn" onClick={() => Taro.navigateTo({ url: '/pages/mental/mental' })}>
+        ⚡ 口算挑战（10 题限时）
+      </Button>
+
       <View className="card stats">
         <View className="stat" onClick={() => Taro.navigateTo({ url: '/pages/medals/medals' })}>
           <View className="num fire">{streak > 0 ? `${streak}🔥` : '0'}</View>
