@@ -116,6 +116,57 @@ export async function chat(history: ChatMessage[], wrongItem: GradeItem): Promis
   return post<{ reply: string }>('/chat', { messages: [sys, ...history] })
 }
 
+/**
+ * 变式练习：基于错题生成 3 道同类变式
+ * 借鉴作业帮的变式训练；规避抄答案——题目不含解析，答错只给方向性提示
+ */
+export interface VariantQuestion {
+  no: number
+  questionText: string
+  correctAnswer: string
+  knowledgePoint: string
+}
+
+export async function generateVariants(wrongItem: GradeItem): Promise<VariantQuestion[]> {
+  if (MODE === 'mock') {
+    await delay(500)
+    return [
+      { no: 1, questionText: `（变式）用竖式计算 ${wrongItem.correctAnswer} + 0.9`, correctAnswer: String(Number(wrongItem.correctAnswer) + 0.9), knowledgePoint: wrongItem.knowledgePoint },
+      { no: 2, questionText: '（变式）口算：0.3 + 0.68', correctAnswer: '0.98', knowledgePoint: wrongItem.knowledgePoint },
+      { no: 3, questionText: '（变式）填空：5.06 + 0.94 = （ ）', correctAnswer: '6', knowledgePoint: wrongItem.knowledgePoint }
+    ]
+  }
+  const sys: ChatMessage = {
+    role: 'system',
+    content: `你是小学数学出题老师。基于下面的错题，生成 3 道考查同一知识点、难度相近但不雷同的变式题。
+只输出 JSON：{"items":[{"no":1,"questionText":"...","correctAnswer":"...","knowledgePoint":"..."}]}
+错题：${JSON.stringify(wrongItem)}`
+  }
+  const res = await post<{ items: VariantQuestion[] }>('/chat', { messages: [sys, { role: 'user', content: '请生成变式题。' }] })
+  return res.items
+}
+
+/** 判定变式题作答（api 模式由后端判；mock 模式本地精确匹配） */
+export async function checkVariantAnswer(q: VariantQuestion, answer: string): Promise<{ correct: boolean; hint: string }> {
+  if (MODE === 'mock') {
+    await delay(300)
+    const norm = (s: string) => s.replace(/\s+/g, '').replace(/（/g, '(').replace(/）/g, ')')
+    const correct = norm(answer) === norm(q.correctAnswer)
+    return {
+      correct,
+      hint: correct ? '完全正确，这题销号！' : '不对哦，再想想：先把小数点对齐，再从低位算起。'
+    }
+  }
+  const sys: ChatMessage = {
+    role: 'system',
+    content: `你是小学数学老师。判定学生答案是否正确。
+题目：${JSON.stringify(q)}
+学生答案：${answer}
+只输出 JSON：{"correct":true/false,"hint":"一句话反馈，错则给方向性提示不直接说答案"}`
+  }
+  return post<{ correct: boolean; hint: string }>('/chat', { messages: [sys, { role: 'user', content: '请判定。' }] })
+}
+
 /* ---------- 内部工具 ---------- */
 
 function post<T>(path: string, data: unknown): Promise<T> {

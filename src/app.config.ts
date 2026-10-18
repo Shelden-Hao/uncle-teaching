@@ -3,7 +3,9 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/result/result',
     'pages/tutor/tutor',
-    'pages/history/history'
+    'pages/history/history',
+    'pages/book/book',
+    'pages/wrong-detail/wrong-detail'
   ],
   window: {
     navigationBarBackgroundColor: '#FF8A3C',
@@ -20,6 +22,12 @@ export default defineAppConfig({
         text: '拍一拍',
         iconPath: 'assets/icons/camera.png',
         selectedIconPath: 'assets/icons/camera-active.png'
+      },
+      {
+        pagePath: 'pages/book/book',
+        text: '错题本',
+        iconPath: 'assets/icons/book.png',
+        selectedIconPath: 'assets/icons/book-active.png'
       },
       {
         pagePath: 'pages/history/history',
